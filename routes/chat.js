@@ -72,18 +72,50 @@ router.post('/', (req, res) => {
         // Write data back to file
         const data = fs.writeFileSync('data.json', JSON.stringify(messages));
 
-        res.status(201).json({ message: "Success!" });
+        res.status(201).json({ message: newmsg });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
 
 router.patch('/:id', (req, res) => {
+    try {
+        console.log("Object being patched is: ", req.params.id, req.body);
+        // Open the file
+        const rawdata = fs.readFileSync('data.json');
+        // Decode the file
+        let messages = JSON.parse(rawdata);
 
+        // Get data
+        let id = req.params.id;
+        let rawbody = req.body;
+
+        if (rawbody.name != null) {
+            messages[id].name = rawbody.name;
+        }
+
+        if (rawbody.message != null) {
+            messages[id].message = rawbody.message;
+        }
+
+        if (rawbody.channel != null) {
+            messages[id].channel = rawbody.channel;
+        }
+
+        // Update timestamp
+        messages[id].last_modified_at = date.today() + ' ' + date.timenow();
+
+        // Save data back to file
+        const data = fs.writeFileSync('data.json', JSON.stringify(messages));
+
+        res.status(200).json(messages[id]);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
 router.delete('/:id', (req, res) => {
-
+    
 });
 
 module.exports = router;
