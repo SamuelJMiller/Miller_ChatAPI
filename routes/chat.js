@@ -115,7 +115,20 @@ router.patch('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-    
+    let id = req.params.id;
+
+    const rawdata = fs.readFileSync('data.json');
+    let messages = JSON.parse(rawdata);
+
+    if (messages.length > id) {
+        messages.splice(id, 1);
+
+        const data = fs.writeFileSync('data.json', JSON.stringify(messages));
+
+        res.status(200).json({ message: "Success!" });
+    } else {
+        res.status(500).json({ message: "Error" });
+    }
 });
 
 module.exports = router;
